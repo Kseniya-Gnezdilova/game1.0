@@ -11,8 +11,11 @@ public:
    void setSpeed(int speed);
    int getSpeed() const;
    void setDirection(const QPointF& direction_);
+   void setDamage(const int dmg);
    QPointF getDirection() const;
    int getDamage() const;
+   void move();
+   void move(const QPointF& direction);
 };
 
 
