@@ -1,8 +1,11 @@
 #include "player.h"
 #include <QPainter>
 player::player(){
-   playerHealth = 100;
+   playerHealth = 1000;
    playerSpeed = 5;
+   //setHitBox({0,0},{30,30});
+   setPosition({0,0});
+   setDirection({0, 0});
 }
 void player::setHealth(const int health){
    playerHealth = health;
@@ -16,7 +19,7 @@ void player::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QW
 }
 
 QRectF player::boundingRect() const {
-   return QRectF(0, 0, 30, 30);
+   return QRectF(-10, -10, 20, 20);
 }
 
 const int& player::getSpeed() const{
@@ -33,5 +36,5 @@ void player::move(const QPointF& direction){
    double length = sqrt(pow(direction.x(),2) + pow(direction.y(),2));
    if (length == 0)
       return;
-   setPosition({pos_.x() + playerSpeed * direction.x() / length, pos_.y() + playerSpeed * direction.y() / length});
+   setPosition({std::max(std::min(pos_.x() + playerSpeed * direction.x() / length, 690.),110.), std::max(std::min(pos_.y() + playerSpeed * direction.y() / length, 690.),110.)});
 }
