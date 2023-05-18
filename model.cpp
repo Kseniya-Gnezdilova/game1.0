@@ -7,17 +7,35 @@ Model::Model() : player_(new player()){
 void Model::vecPushBack(bullet* bullet_){
    bullets.push_back(bullet_);
 }
+void Model::setNum(const int num){
+   numAttack = num;
+}
+int Model::getNum() const{
+   return numAttack;
+}
+void Model::vecDelete(){
+   while (!bullets.empty()){
+       auto bullet = bullets.back();
+       delete(bullet);
+       bullets.pop_back();
 
+   }
+}
  void Model::updateModel() {
    player_ -> move(player_->getDirection());
-   for (auto* bullet_: bullets){
-      QPointF first = player_->getPosition();
-      QPointF second = bullet_->getPosition();
-      auto dst = sqrt(pow(first.x() - second.x(),2) + pow(first.y() - second.y(),2));
-      if (dst <= 1){
-         int dmg = bullet_->getDamage();
-         player_->setHealth(player_->getHealth() - dmg);
-      }
-   }
 
+   for (auto* bullet_: bullets){
+      if (player_->collidesWithItem(bullet_)) {
+          player_->setHealth(player_->getHealth() - bullet_->getDamage());
+      }
+      bullet_-> move();
+      if (bullet_->getPosition().x() < 0 || bullet_->getPosition().x() > 800 || bullet_->getPosition().y() < 0 || bullet_->getPosition().y() > 800){
+          auto comp = std::remove_if(bullets.begin(),bullets.end(),[bullet_](auto* bullet){return bullet == bullet_;});
+          bullets.erase(comp, bullets.end());
+          delete(bullet_);
+      }
+
+   }
 }
+
+
