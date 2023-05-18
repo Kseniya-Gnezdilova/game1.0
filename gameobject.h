@@ -1,7 +1,8 @@
 #pragma once
 #include <QPointF>
 #include <QGraphicsItem>
-
+#include <QRectF>
+#include <QPainter>
 
 class GameObject  : public QGraphicsItem{
 protected:
