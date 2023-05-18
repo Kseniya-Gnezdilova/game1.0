@@ -1,27 +1,125 @@
 #include "mainwindow.h"
 #include <QKeyEvent>
-#include <QMap>
 #include <QTimer>
 #include "stick.h"
 #include "circle.h"
+#include <QRectF>
+#include<QPainter>
+#include<QPixmap>
+#include <stdlib.h>
+#include <hpbar.h>
 
 MainWindow::MainWindow(): QGraphicsScene() {
+
    model = new Model();
-   addItem(model->player_);
-   stick* stick_ = new stick();
-   addItem(stick_);
-   circle* circle_ = new circle();
-   addItem(circle_);
-   model ->vecPushBack(stick_);
+   auto* rect = new stick();
+   rect->setStick(600,600);
+   rect->setDamage(0);
+   rect->setPosition(400,400);
+   rect->setSpeed(0);
+   addItem(rect);
    auto* timer = new QTimer(this);
-       connect(timer, &QTimer::timeout, [this,circle_]() {
-          model->updateModel();
-          circle_->move();
-          if (model->player_->getHealth() == 0) { views().front() -> close(); }
+       connect(timer, &QTimer::timeout, [this]() {
+       update();
+           model->updateModel();
+           if (model->player_->getHealth() <= 0) {
+                  views().front() -> close();
+           }
+
        });
-       timer->start(16);
+   uploadAttack();
+       auto* hpbar = new hpBar(model->player_);
+       addItem(hpbar);
+   timer->start(16);
+}
+void MainWindow::uploadAttack(){
+   model->player_= new player();
+   model->player_->setPosition({400,400});
+   addItem(model->player_);
+   attack1();
+}
+void MainWindow::attack1(){
+    model->setNum(15);
+    auto* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this,timer]() {
+        for (double angle = model->getNum()*10; angle < 360 + model->getNum() * 10 && model->getNum() > 0; angle+=36){
+            auto* circle_ = new circle();
+            circle_->setRadius(10);
+            circle_->setPosition({400 + 400*cos(angle*M_PI/180.), 400 + 400*sin(angle*M_PI/180.)});
+            circle_->setDirection({400,400});
+            circle_->setSpeed(4);
+            addItem(circle_);
+            model->vecPushBack(circle_);
+        }
+        model->setNum(model->getNum() - 1);
+        if (model->getNum() == 0) {timer->stop(); model->vecDelete(); attack2();}
+        });
+    timer->start(800);
 }
 
+void MainWindow::attack2(){
+    model->setNum(15);
+    auto* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this,timer]() {
+        for (double split = 800; split > 0 && model->getNum() > 0; split-=60){
+            auto* stick_ = new stick();
+            stick_->setStick(10,100);
+            stick_->setPosition({0,split});
+            stick_->setDirection({800 + (double)model ->getNum()*20,split + model ->getNum()*5});
+            stick_->setSpeed(3);
+            addItem(stick_);
+            model -> vecPushBack(stick_);
+        }
+        model->setNum(model->getNum() - 1);
+        if (model->getNum() == 0){timer->stop(); model->vecDelete(); attack3();}
+    });
+    timer->start(800);
+}
+
+void MainWindow::attack3(){
+    model->setNum(20);
+    auto* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this,timer](){
+        if (model->getNum() == 0){timer->stop(); model->vecDelete();attack4();}
+            auto* stickLeft = new stick();
+            stickLeft->setStick(10,400);
+            stickLeft->setPosition({200,0});
+            stickLeft->setDirection({200,800});
+            stickLeft->setSpeed(3);
+            addItem(stickLeft);
+            model -> vecPushBack(stickLeft);
+            auto* stickRigth = new stick();
+            stickRigth->setStick(10,400);
+            stickRigth->setPosition({600,800});
+            stickRigth->setDirection({600,0});
+            stickRigth->setSpeed(3);
+            addItem(stickRigth);
+            model -> vecPushBack(stickRigth);
+
+        model->setNum(model->getNum() - 1);
+    });
+    timer->start(700);
+}
+void MainWindow::attack4(){
+    model->setNum(15);
+    srand(time(NULL));
+    auto* timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, [this,timer](){
+        if (model->getNum() == 0){timer->stop(); return;}
+        for (int num = 0; num < 10; num++){
+            int rnd = (rand() % 20) * 30 + 115;
+            auto* circle_ = new circle();
+            circle_->setRadius(15);
+            circle_->setPosition({(double)rnd,0});
+            circle_->setDirection({(double)rnd,800});
+            circle_->setSpeed(6);
+            addItem(circle_);
+            model->vecPushBack(circle_);
+        }
+        model->setNum(model->getNum() - 1);
+    });
+    timer->start(900);
+}
 void MainWindow::keyPressEvent(QKeyEvent *event) {
    QGraphicsScene::keyPressEvent(event);
    auto [x,y] = model->player_ -> getDirection();
