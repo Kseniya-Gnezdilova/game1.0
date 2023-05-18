@@ -2,14 +2,11 @@
 #include "bullet.h"
 
 class circle: public bullet{
-   QRectF circleRect;
+    double radius;
 public:
+   void setRadius(const double radius_);
+   double getRadius() const;
    circle();
-   void setRect(QRectF rect);
-   void setRect(QPointF left, QPointF rigth);
-   QRectF getRect() const;
-   void move();
-   void move(int speed ,const QPointF& direction);
    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
    QRectF boundingRect() const override;
 };
