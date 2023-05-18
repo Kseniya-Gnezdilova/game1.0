@@ -2,14 +2,13 @@
 #include "bullet.h"
 
 class stick: public bullet{
-   QRectF stickRect;
+    double height;
+    double width;
 public:
    stick();
-   void setRect(QRectF rect);
-   void setRect(QPointF left, QPointF rigth);
-   QRectF getRect() const;
-   void move();
-   void move(int speed ,const QPointF& direction);
+   void setStick(const double height_, const double width_);
+   double getHeight() const;
+   double getWidth() const;
    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
    QRectF boundingRect() const override;
 };
